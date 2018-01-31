@@ -3,20 +3,49 @@ package projects.nyinyihtunlwin.firechat.activities;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import projects.nyinyihtunlwin.firechat.R;
+import projects.nyinyihtunlwin.firechat.adapters.ChatListAdapter;
+import projects.nyinyihtunlwin.firechat.components.EmptyViewPod;
+import projects.nyinyihtunlwin.firechat.components.SmartRecyclerView;
+import projects.nyinyihtunlwin.firechat.components.SmartScrollListener;
+import projects.nyinyihtunlwin.firechat.data.models.FireChatModel;
+import projects.nyinyihtunlwin.firechat.events.RestApiEvents;
 
 public class ChatListActivity extends BaseActivity {
+
+    @BindView(R.id.rv_chat_list)
+    SmartRecyclerView rvChatList;
+
+    @BindView(R.id.vp_empty)
+    EmptyViewPod vpEmpty;
+
+    @BindView(R.id.swipe_refresh_layout)
+    SwipeRefreshLayout swipeRefreshLayout;
+
+    private SmartScrollListener mSmartScrollListener;
+
+    private ChatListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_list);
+        ButterKnife.bind(this, this);
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -28,23 +57,63 @@ public class ChatListActivity extends BaseActivity {
                         .setAction("Action", null).show();
             }
         });
+
+
+        rvChatList.setEmptyView(vpEmpty);
+        rvChatList.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new ChatListAdapter(getApplicationContext());
+        rvChatList.setAdapter(adapter);
+        rvChatList.setHasFixedSize(true);
+
+        mSmartScrollListener = new SmartScrollListener(new SmartScrollListener.OnSmartScrollListener() {
+            @Override
+            public void onListEndReached() {
+
+            }
+        });
+        rvChatList.addOnScrollListener(mSmartScrollListener);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onNewsDataLoaded(RestApiEvents.ChatDataLoadedEvent event) {
+       /* adapter.appendNewData(event.getLoadedChat());
+        swipeRefreshLayout.setRefreshing(false);*/
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onNewsDataLoaded(RestApiEvents.UserDataLoadedEvent event) {
+        adapter.appendNewData(event.getLoadedUser());
+        swipeRefreshLayout.setRefreshing(false);
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+        if (FireChatModel.getInstance().getmChatList() != null && FireChatModel.getInstance().getmChatList().size() > 0) {
+            adapter.appendNewData(FireChatModel.getInstance().getmUserList());
+        } else {
+            swipeRefreshLayout.setRefreshing(true);
+            FireChatModel.getInstance().startLoadingRegisteredUser(getApplicationContext());
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_chat_list, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }

@@ -7,6 +7,9 @@ import android.app.Application;
  */
 
 public class FireChatApp extends Application {
+
+    public static final String LOG = "FireChat";
+
     @Override
     public void onCreate() {
         super.onCreate();

@@ -26,7 +26,7 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <projects.nyinyihtunlwin.firechat.components.SmartRecyclerView
-            android:id="@+id/iv_chat_list"
+            android:id="@+id/rv_chat_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
