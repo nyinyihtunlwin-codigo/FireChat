@@ -5,4 +5,18 @@ package projects.nyinyihtunlwin.firechat.data.models;
  */
 
 public class FireChatModel {
+
+    private static FireChatModel objectInstance;
+
+
+    private FireChatModel() {
+    }
+
+    public static FireChatModel getInstance() {
+        if (objectInstance == null) {
+            objectInstance = new FireChatModel();
+        }
+        return objectInstance;
+    }
+
 }
