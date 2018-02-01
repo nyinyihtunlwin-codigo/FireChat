@@ -38,6 +38,7 @@
             android:textColor="@color/primary" />
 
         <net.aungpyaephyo.mmtextview.components.MMTextView
+            android:id="@+id/btn_disgree"
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:layout_alignParentBottom="true"

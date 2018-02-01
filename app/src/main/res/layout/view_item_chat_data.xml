@@ -8,6 +8,7 @@
         android:id="@+id/iv_me"
         android:layout_width="48dp"
         android:layout_height="48dp"
+        android:layout_alignBottom="@id/tv_text"
         android:layout_alignParentRight="true"
         android:src="@mipmap/ic_launcher_round" />
 
