@@ -1,5 +1,6 @@
 package projects.nyinyihtunlwin.firechat.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -22,7 +23,9 @@ import projects.nyinyihtunlwin.firechat.components.EmptyViewPod;
 import projects.nyinyihtunlwin.firechat.components.SmartRecyclerView;
 import projects.nyinyihtunlwin.firechat.components.SmartScrollListener;
 import projects.nyinyihtunlwin.firechat.data.models.FireChatModel;
+import projects.nyinyihtunlwin.firechat.dialogs.SignInDialog;
 import projects.nyinyihtunlwin.firechat.events.RestApiEvents;
+import projects.nyinyihtunlwin.firechat.events.TapChatEvent;
 
 public class ChatListActivity extends BaseActivity {
 
@@ -75,15 +78,17 @@ public class ChatListActivity extends BaseActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onNewsDataLoaded(RestApiEvents.ChatDataLoadedEvent event) {
-       /* adapter.appendNewData(event.getLoadedChat());
-        swipeRefreshLayout.setRefreshing(false);*/
+    public void onChatListDataLoaded(RestApiEvents.UserDataLoadedEvent event) {
+        adapter.appendNewData(event.getLoadedUser());
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onNewsDataLoaded(RestApiEvents.UserDataLoadedEvent event) {
-        adapter.appendNewData(event.getLoadedUser());
-        swipeRefreshLayout.setRefreshing(false);
+    public void onTapConversation(TapChatEvent event) {
+  /*      Intent intent = ConversationActivity.newIntent(getApplicationContext(), event.getConversationId());
+        startActivity(intent);*/
+        SignInDialog dialog = new SignInDialog();
+        dialog.show(getSupportFragmentManager(), "Authenticate");
     }
 
 

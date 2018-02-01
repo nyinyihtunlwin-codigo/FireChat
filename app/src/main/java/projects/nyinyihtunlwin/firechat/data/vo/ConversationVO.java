@@ -9,6 +9,7 @@ public class ConversationVO {
     private String byUser;
     private String conversationId;
     private String msg;
+    private String photoMsg;
     private String timestamp;
 
     public String getByUser() {
@@ -25,5 +26,9 @@ public class ConversationVO {
 
     public String getTimestamp() {
         return timestamp;
+    }
+
+    public String getPhotoMsg() {
+        return photoMsg;
     }
 }

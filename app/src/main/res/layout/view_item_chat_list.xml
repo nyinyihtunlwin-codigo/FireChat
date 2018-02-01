@@ -3,6 +3,8 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:clickable="true"
+    android:foreground="@drawable/ripple_primary"
     card_view:cardBackgroundColor="@color/white"
     card_view:cardCornerRadius="1dp"
     card_view:cardElevation="2dp">
@@ -33,12 +35,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignTop="@id/iv_friend"
-            android:layout_marginTop="@dimen/margin_medium"
-            android:textColor="@color/primary_text"
-            android:textStyle="bold"
             android:layout_marginStart="@dimen/margin_medium"
+            android:layout_marginTop="@dimen/margin_medium"
             android:layout_toEndOf="@id/iv_friend"
-            android:layout_toStartOf="@id/iv_more" />
+            android:layout_toStartOf="@id/iv_more"
+            android:textColor="@color/primary_text"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tv_conversations"
@@ -47,8 +49,8 @@
             android:layout_alignLeft="@id/tv_friend_name"
             android:layout_below="@id/tv_friend_name"
             android:layout_marginStart="@dimen/margin_medium"
-            android:textColor="@color/secondary_text"
             android:layout_marginTop="@dimen/margin_medium"
-            android:layout_toStartOf="@id/iv_more" />
+            android:layout_toStartOf="@id/iv_more"
+            android:textColor="@color/secondary_text" />
     </RelativeLayout>
 </android.support.v7.widget.CardView>
