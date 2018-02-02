@@ -22,7 +22,10 @@ import com.google.firebase.database.ValueEventListener;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import projects.nyinyihtunlwin.firechat.FireChatApp;
 import projects.nyinyihtunlwin.firechat.data.vo.ChatVO;
@@ -45,6 +48,9 @@ public class FireChatModel {
 
     private List<ChatVO> mChatList;
     private List<UserVO> mUserList;
+
+    private String currentUserId;
+    private int i = 0;
 
     private FireChatModel() {
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -85,21 +91,59 @@ public class FireChatModel {
     }
 
 
-    public void startLoadingConversations(final Context context) {
+    public void startConversation(final UserVO userVO) {
 
-        DatabaseReference fireChatDBR = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference conversationDBR = fireChatDBR.child(CONVERSATIONS);
+        final DatabaseReference fireChatDBR = FirebaseDatabase.getInstance().getReference();
+        final DatabaseReference conversationDBR = fireChatDBR.child(CONVERSATIONS);
         conversationDBR.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<ChatVO> chatList = new ArrayList<>();
                 for (DataSnapshot chatDSS : dataSnapshot.getChildren()) {
-                    ChatVO news = chatDSS.getValue(ChatVO.class);
-                    chatList.add(news);
+                    ChatVO chat = chatDSS.getValue(ChatVO.class);
+                    chatList.add(chat);
                 }
-                mChatList.addAll(chatList);
-                RestApiEvents.ChatDataLoadedEvent event = new RestApiEvents.ChatDataLoadedEvent(mChatList);
-                EventBus.getDefault().post(event);
+                for (ChatVO chatVO : chatList) {
+                    for (UserVO user : chatVO.getUserList().values()) {
+                        if (user.getUserId() == userVO.getUserId()) {
+                            i++;
+                        }
+                        if (user.getUserId() == currentUserId) {
+                            i++;
+                        }
+                    }
+                }
+                DatabaseReference userDBR = fireChatDBR.child(REGISTERED_USER).child(currentUserId);
+                userDBR.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        final Map<String, UserVO> userList = new HashMap<>();
+                        userList.put(userVO.getUserId(), userVO);
+
+                        UserVO currentUser = dataSnapshot.getValue(UserVO.class);
+                        userList.put(currentUser.getUserId(), currentUser);
+
+                        Log.e("UID", userList.size() + "");
+
+
+                        if (i == 0) {
+                            ChatVO chatVO = new ChatVO();
+                            chatVO.setChatId(userVO.getUserId() + userVO.getUserId());
+                            chatVO.setStartedAt(new Date().toString());
+                            chatVO.setUserList(userList);
+                            conversationDBR.child(chatVO.getChatId()).setValue(chatVO);
+                        } else if (i == 2) {
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+
             }
 
             @Override
@@ -107,6 +151,7 @@ public class FireChatModel {
 
             }
         });
+
     }
 
     public boolean isUserAuthenticate() {
@@ -133,6 +178,18 @@ public class FireChatModel {
                             mFirebaseUser = mFirebaseAuth.getCurrentUser();
                             Log.d(FireChatApp.LOG, "signInWithCredential - successful");
                             delegate.onSuccessAuthenticate(signInAccount);
+
+                            UserVO userVO = new UserVO();
+                            userVO.setEmail(signInAccount.getEmail());
+                            userVO.setCoverUrl(signInAccount.getPhotoUrl().toString());
+                            userVO.setName(signInAccount.getDisplayName());
+                            userVO.setProfileUrl(signInAccount.getPhotoUrl().toString());
+                            userVO.setUserId(signInAccount.getId());
+                            DatabaseReference fireChatDBR = FirebaseDatabase.getInstance().getReference();
+                            DatabaseReference registeredUserDBR = fireChatDBR.child(REGISTERED_USER);
+                            registeredUserDBR.child(userVO.getUserId()).setValue(userVO);
+
+                            currentUserId = signInAccount.getId();
                         }
                     }
                 })

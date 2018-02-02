@@ -25,17 +25,17 @@
 
 
         <net.aungpyaephyo.mmtextview.components.MMTextView
-            android:id="@+id/btn_agree"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:clickable="true"
-            android:foreground="@drawable/ripple_primary"
-            android:gravity="center"
-            android:padding="@dimen/margin_medium"
-            android:text="@string/just_sign_in"
-            android:textColor="@color/primary" />
+        android:id="@+id/btn_agree"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:clickable="true"
+        android:foreground="@drawable/ripple_primary"
+        android:gravity="center"
+        android:padding="@dimen/margin_medium"
+        android:text="@string/just_sign_in"
+        android:textColor="@color/primary" />
 
         <net.aungpyaephyo.mmtextview.components.MMTextView
             android:id="@+id/btn_disgree"

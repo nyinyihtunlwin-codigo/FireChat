@@ -5,6 +5,7 @@ import android.content.Context;
 import java.util.List;
 
 import projects.nyinyihtunlwin.firechat.data.vo.ChatVO;
+import projects.nyinyihtunlwin.firechat.data.vo.UserVO;
 
 /**
  * Created by Dell on 2/1/2018.
@@ -18,7 +19,7 @@ public interface ChatListView {
 
     Context getContext();
 
-    void navigateToConversationScreen(String conversationId);
+    void navigateToConversationScreen(UserVO userVO);
 
     void showAuthenticationDialog();
 

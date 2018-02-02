@@ -38,6 +38,7 @@ import projects.nyinyihtunlwin.firechat.components.SmartRecyclerView;
 import projects.nyinyihtunlwin.firechat.components.SmartScrollListener;
 import projects.nyinyihtunlwin.firechat.data.models.FireChatModel;
 import projects.nyinyihtunlwin.firechat.data.vo.ChatVO;
+import projects.nyinyihtunlwin.firechat.data.vo.UserVO;
 import projects.nyinyihtunlwin.firechat.dialogs.SignInDialog;
 import projects.nyinyihtunlwin.firechat.events.RestApiEvents;
 import projects.nyinyihtunlwin.firechat.events.TapChatEvent;
@@ -73,15 +74,6 @@ public class ChatListActivity extends BaseActivity implements ChatListView, Goog
         setSupportActionBar(toolbar);
 
         ChatListPresenter.getInstance().onCreate(this);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
 
         rvChatList.setEmptyView(vpEmpty);
@@ -137,7 +129,7 @@ public class ChatListActivity extends BaseActivity implements ChatListView, Goog
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onTapConversation(TapChatEvent event) {
-        ChatListPresenter.getInstance().onTapConversation(event.getConversationId());
+        ChatListPresenter.getInstance().onTapConversation(event.getUser());
     }
 
 
@@ -191,8 +183,8 @@ public class ChatListActivity extends BaseActivity implements ChatListView, Goog
     }
 
     @Override
-    public void navigateToConversationScreen(String conversationId) {
-        Intent intent = ConversationActivity.newIntent(getApplicationContext(), conversationId);
+    public void navigateToConversationScreen(UserVO userVO) {
+        Intent intent = ConversationActivity.newIntent(getApplicationContext());
         startActivity(intent);
     }
 

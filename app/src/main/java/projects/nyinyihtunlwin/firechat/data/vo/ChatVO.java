@@ -28,4 +28,20 @@ public class ChatVO {
     public Map<String,UserVO> getUserList() {
         return userList;
     }
+
+    public void setChatId(String chatId) {
+        this.chatId = chatId;
+    }
+
+    public void setStartedAt(String startedAt) {
+        this.startedAt = startedAt;
+    }
+
+    public void setConversations(Map<String, ConversationVO> conversations) {
+        this.conversations = conversations;
+    }
+
+    public void setUserList(Map<String, UserVO> userList) {
+        this.userList = userList;
+    }
 }
