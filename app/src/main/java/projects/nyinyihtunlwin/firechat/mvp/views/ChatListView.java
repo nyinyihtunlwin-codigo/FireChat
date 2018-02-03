@@ -19,7 +19,7 @@ public interface ChatListView {
 
     Context getContext();
 
-    void navigateToConversationScreen(String partnerId);
+    void navigateToConversationScreen(UserVO partner);
 
     void showAuthenticationDialog();
 

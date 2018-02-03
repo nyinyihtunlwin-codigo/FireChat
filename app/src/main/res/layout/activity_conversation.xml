@@ -24,6 +24,7 @@
                 android:orientation="horizontal">
 
                 <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/iv_partner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/margin_medium"
@@ -31,12 +32,12 @@
                     android:src="@mipmap/ic_launcher_round" />
 
                 <TextView
+                    android:id="@+id/tv_partner_name"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginStart="@dimen/margin_medium"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
-                    android:text="Friend's Name"
                     android:textColor="@color/white"
                     android:textSize="@dimen/text_regular" />
 
@@ -55,70 +56,85 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <projects.nyinyihtunlwin.firechat.components.SmartRecyclerView
-        android:id="@+id/rv_chat_list"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:orientation="vertical">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <RelativeLayout
-            android:id="@+id/rl_selected_photo"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:visibility="gone">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-            <ImageView
-                android:id="@+id/iv_selected_photo"
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                android:scaleType="centerCrop" />
+            <projects.nyinyihtunlwin.firechat.components.SmartRecyclerView
+                android:id="@+id/rv_conversations"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@id/ll_message" />
 
-            <ImageView
-                android:id="@+id/iv_close"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/ll_message"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:background="@android:drawable/screen_background_dark_transparent"
-                android:padding="@dimen/margin_medium"
-                android:src="@drawable/ic_close_24dp" />
+                android:layout_alignParentBottom="true"
+                android:layout_gravity="bottom|end"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:id="@+id/rl_selected_photo"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/iv_selected_photo"
+                        android:layout_width="200dp"
+                        android:layout_height="200dp"
+                        android:scaleType="centerCrop" />
+
+                    <ImageView
+                        android:id="@+id/iv_close"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:background="@android:drawable/screen_background_dark_transparent"
+                        android:padding="@dimen/margin_medium"
+                        android:src="@drawable/ic_close_24dp" />
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/black" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/et_message"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:background="@android:drawable/screen_background_light_transparent"
+                        android:hint="@string/write_message"
+                        android:paddingStart="@dimen/margin_medium" />
+
+                    <ImageView
+                        android:id="@+id/iv_send"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:clickable="true"
+                        android:foreground="@drawable/ripple_primary"
+                        android:paddingEnd="@dimen/margin_medium"
+                        android:src="@drawable/ic_send_24dp" />
+                </LinearLayout>
+            </LinearLayout>
         </RelativeLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/black" />
+    </android.support.v4.widget.SwipeRefreshLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/et_message"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:background="@android:drawable/screen_background_light_transparent"
-                android:hint="@string/write_message"
-                android:paddingStart="@dimen/margin_medium" />
-
-            <ImageView
-                android:id="@+id/iv_send"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:clickable="true"
-                android:foreground="@drawable/ripple_primary"
-                android:paddingEnd="@dimen/margin_medium"
-                android:src="@drawable/ic_send_24dp" />
-        </LinearLayout>
-    </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

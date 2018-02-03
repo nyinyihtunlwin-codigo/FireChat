@@ -5,6 +5,7 @@ import android.content.Context;
 import java.util.List;
 
 import projects.nyinyihtunlwin.firechat.data.vo.ChatVO;
+import projects.nyinyihtunlwin.firechat.data.vo.ConversationVO;
 import projects.nyinyihtunlwin.firechat.data.vo.UserVO;
 
 /**
@@ -29,14 +30,14 @@ public class RestApiEvents {
     }
 
     public static class ChatDataLoadedEvent {
-        private List<ChatVO> loadedChat;
+        private List<ConversationVO> loadedConversations;
 
-        public ChatDataLoadedEvent(List<ChatVO> loadedNews) {
-            this.loadedChat = loadedNews;
+        public ChatDataLoadedEvent(List<ConversationVO> loadedConversations) {
+            this.loadedConversations = loadedConversations;
         }
 
-        public List<ChatVO> getLoadedChat() {
-            return loadedChat;
+        public List<ConversationVO> getLoadedConversations() {
+            return loadedConversations;
         }
     }
 

@@ -129,7 +129,7 @@ public class ChatListActivity extends BaseActivity implements ChatListView, Goog
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onTapConversation(TapChatEvent event) {
-        ChatListPresenter.getInstance().onTapConversation(event.getPartnerId());
+        ChatListPresenter.getInstance().onTapConversation(event.getPartner());
     }
 
 
@@ -137,7 +137,7 @@ public class ChatListActivity extends BaseActivity implements ChatListView, Goog
     protected void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
-        if (FireChatModel.getInstance().getmChatList() != null && FireChatModel.getInstance().getmChatList().size() > 0) {
+        if (FireChatModel.getInstance().getmUserList() != null && FireChatModel.getInstance().getmUserList().size() > 0) {
             adapter.appendNewData(FireChatModel.getInstance().getmUserList());
         } else {
             swipeRefreshLayout.setRefreshing(true);
@@ -183,8 +183,8 @@ public class ChatListActivity extends BaseActivity implements ChatListView, Goog
     }
 
     @Override
-    public void navigateToConversationScreen(String partnerId) {
-        Intent intent = ConversationActivity.newIntent(getApplicationContext(), partnerId);
+    public void navigateToConversationScreen(UserVO partner) {
+        Intent intent = ConversationActivity.newIntent(getApplicationContext(), partner.getUserId(), partner.getName(), partner.getProfileUrl());
         startActivity(intent);
     }
 

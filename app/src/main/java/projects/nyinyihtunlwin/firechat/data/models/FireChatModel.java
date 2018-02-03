@@ -39,6 +39,7 @@ import projects.nyinyihtunlwin.firechat.data.vo.ConversationVO;
 import projects.nyinyihtunlwin.firechat.data.vo.UserVO;
 import projects.nyinyihtunlwin.firechat.events.RestApiEvents;
 import projects.nyinyihtunlwin.firechat.utils.AppConstants;
+import projects.nyinyihtunlwin.firechat.utils.ConfigUtils;
 
 /**
  * Created by Dell on 1/29/2018.
@@ -54,18 +55,21 @@ public class FireChatModel {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
 
-    private List<ChatVO> mChatList;
+    private List<ConversationVO> mConversationList;
     private List<UserVO> mUserList;
 
-    private String currentUserId = "102412084351996807702";
+   // private String currentUserId = "102412084351996807702";
     private String mPartnerId;
     private int found = 0;
+
+    private ConfigUtils mConfigUtils;
 
     private FireChatModel() {
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
-        mChatList = new ArrayList<>();
+        mConversationList = new ArrayList<>();
         mUserList = new ArrayList<>();
+        mConfigUtils = FireChatApp.getConfigUtils();
     }
 
     public static FireChatModel getInstance() {
@@ -87,6 +91,7 @@ public class FireChatModel {
                     UserVO user = userDSS.getValue(UserVO.class);
                     userList.add(user);
                 }
+
                 mUserList.addAll(userList);
                 RestApiEvents.UserDataLoadedEvent event = new RestApiEvents.UserDataLoadedEvent(mUserList);
                 EventBus.getDefault().post(event);
@@ -101,7 +106,7 @@ public class FireChatModel {
 
 
     public void startConversation(final String partnerId) {
-
+        found=0;
         mPartnerId = partnerId;
 
         final DatabaseReference fireChatDBR = FirebaseDatabase.getInstance().getReference();
@@ -120,7 +125,7 @@ public class FireChatModel {
                         if (user.getUserId().equals(partnerId)) {
                             i++;
                         }
-                        if (user.getUserId().equals(currentUserId)) {
+                        if (user.getUserId().equals(mConfigUtils.loadCurrentUserId())) {
                             i++;
                         }
                     }
@@ -130,7 +135,7 @@ public class FireChatModel {
                     }
                 }
                 if (found == 0) {
-                    DatabaseReference userDBR = fireChatDBR.child(REGISTERED_USER).child(currentUserId);
+                    DatabaseReference userDBR = fireChatDBR.child(REGISTERED_USER).child(mConfigUtils.loadCurrentUserId());
                     userDBR.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -149,7 +154,7 @@ public class FireChatModel {
                                     userList.put(partnerUser.getUserId(), partnerUser);
 
                                     ChatVO chatVO = new ChatVO();
-                                    chatVO.setChatId(currentUserId + mPartnerId);
+                                    chatVO.setChatId(mConfigUtils.loadCurrentUserId() + mPartnerId);
                                     chatVO.setStartedAt(new Date().toString());
                                     chatVO.setUserList(userList);
                                     conversationDBR.child(chatVO.getChatId()).setValue(chatVO);
@@ -169,12 +174,15 @@ public class FireChatModel {
                     });
                 } else {
                     DatabaseReference chatDBR = FirebaseDatabase.getInstance().getReference();
-                    final DatabaseReference conversatinDBR = chatDBR.child(CHAT).child(currentUserId + mPartnerId);
+                    final DatabaseReference conversatinDBR = chatDBR.child(CHAT).child(mConfigUtils.loadCurrentUserId() + mPartnerId);
                     conversatinDBR.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            ChatVO chatVO=dataSnapshot.getValue(ChatVO.class);
-                            int size = chatVO.getConversations().size();
+                            mConversationList = new ArrayList<>();
+                            ChatVO chatVO = dataSnapshot.getValue(ChatVO.class);
+                            mConversationList.addAll(chatVO.getConversations().values());
+                            RestApiEvents.ChatDataLoadedEvent event = new RestApiEvents.ChatDataLoadedEvent(mConversationList);
+                            EventBus.getDefault().post(event);
                         }
 
                         @Override
@@ -228,7 +236,8 @@ public class FireChatModel {
                             DatabaseReference registeredUserDBR = fireChatDBR.child(REGISTERED_USER);
                             registeredUserDBR.child(userVO.getUserId()).setValue(userVO);
 
-                            currentUserId = signInAccount.getId();
+                          //  currentUserId = signInAccount.getId();
+                            mConfigUtils.saveCurrentUserId(signInAccount.getId());
                         }
                     }
                 })
@@ -242,38 +251,57 @@ public class FireChatModel {
     }
 
     public void sendMessage(final String mPhotoUrl, final String message) {
-        uploadFile(mPhotoUrl, new UploadFileCallback() {
-            @Override
-            public void onUploadSucceeded(String uploadedPaths) {
+        if (mPhotoUrl != null) {
+            uploadFile(mPhotoUrl, new UploadFileCallback() {
+                @Override
+                public void onUploadSucceeded(String uploadedPaths) {
+                    String image = uploadedPaths;
+                    final ConversationVO conversationVO = new ConversationVO(mConfigUtils.loadCurrentUserId(), mConfigUtils.loadCurrentUserId() + new Date().toString(), message, mPhotoUrl, new Date().toString());
+                    if (found == 1) {
+                        DatabaseReference chatDBR = FirebaseDatabase.getInstance().getReference();
+                        final DatabaseReference conversatinDBR = chatDBR.child(CHAT).child(mConfigUtils.loadCurrentUserId() + mPartnerId);
+                        conversatinDBR.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                ChatVO value = dataSnapshot.getValue(ChatVO.class);
+                                value.getConversations().put(conversationVO.getConversationId(), conversationVO);
+                                conversatinDBR.setValue(value);
+                            }
 
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
 
-                String image = uploadedPaths;
-                final ConversationVO conversationVO = new ConversationVO(currentUserId, currentUserId + new Random(9).nextInt(), message, mPhotoUrl, new Date().toString());
-                if (found == 1) {
-                    DatabaseReference chatDBR = FirebaseDatabase.getInstance().getReference();
-                    final DatabaseReference conversatinDBR = chatDBR.child(CHAT).child(currentUserId + mPartnerId);
-                    conversatinDBR.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            ChatVO value = dataSnapshot.getValue(ChatVO.class);
-                            value.getConversations().put(conversationVO.getConversationId(), conversationVO);
-                            conversatinDBR.setValue(value);
-                        }
+                            }
+                        });
+                    }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
                 }
 
-            }
+                @Override
+                public void onUploadFailed(String msg) {
 
-            @Override
-            public void onUploadFailed(String msg) {
+                }
+            });
+        }else {
+            final ConversationVO conversationVO = new ConversationVO(mConfigUtils.loadCurrentUserId(), mConfigUtils.loadCurrentUserId() + new Date().toString(), message,"", new Date().toString());
+            if (found == 1) {
+                DatabaseReference chatDBR = FirebaseDatabase.getInstance().getReference();
+                final DatabaseReference conversatinDBR = chatDBR.child(CHAT).child(mConfigUtils.loadCurrentUserId() + mPartnerId);
+                conversatinDBR.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        ChatVO value = dataSnapshot.getValue(ChatVO.class);
+                        value.getConversations().put(conversationVO.getConversationId(), conversationVO);
+                        conversatinDBR.setValue(value);
+                    }
 
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
             }
-        });
+        }
     }
 
     public void uploadFile(String fileToUpload, final UploadFileCallback uploadFileCallback) {
@@ -309,8 +337,8 @@ public class FireChatModel {
         void onFailureAuthenticate(String errrorMsg);
     }
 
-    public List<ChatVO> getmChatList() {
-        return mChatList;
+    public List<ConversationVO> getConversationList() {
+        return mConversationList;
     }
 
     public List<UserVO> getmUserList() {

@@ -1,21 +1,23 @@
 package projects.nyinyihtunlwin.firechat.events;
 
+import projects.nyinyihtunlwin.firechat.data.vo.UserVO;
+
 /**
  * Created by Dell on 12/2/2017.
  */
 
 public class TapChatEvent {
-    String partnerId;
+    UserVO mPartner;
 
-    public TapChatEvent(String partnerId) {
-        this.partnerId = partnerId;
+    public TapChatEvent(UserVO mPartner) {
+        this.mPartner = mPartner;
     }
 
-    public String getPartnerId() {
-        return partnerId;
+    public UserVO getPartner() {
+        return mPartner;
     }
 
-    public void setPartnerId(String partnerId) {
-        this.partnerId = partnerId;
+    public void setPartner(UserVO partner) {
+        this.mPartner = partner;
     }
 }
