@@ -12,6 +12,16 @@ public class ConversationVO {
     private String photoMsg;
     private String timestamp;
 
+    public ConversationVO(){}
+
+    public ConversationVO(String byUser, String conversationId, String msg, String photoMsg, String timestamp) {
+        this.byUser = byUser;
+        this.conversationId = conversationId;
+        this.msg = msg;
+        this.photoMsg = photoMsg;
+        this.timestamp = timestamp;
+    }
+
     public String getByUser() {
         return byUser;
     }
@@ -31,4 +41,6 @@ public class ConversationVO {
     public String getPhotoMsg() {
         return photoMsg;
     }
+
+
 }

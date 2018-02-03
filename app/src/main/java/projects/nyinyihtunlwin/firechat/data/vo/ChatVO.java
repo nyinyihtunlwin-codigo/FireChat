@@ -1,5 +1,6 @@
 package projects.nyinyihtunlwin.firechat.data.vo;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -22,6 +23,9 @@ public class ChatVO {
     }
 
     public Map<String,ConversationVO> getConversations() {
+        if(conversations==null){
+            conversations=new HashMap<>();
+        }
         return conversations;
     }
 

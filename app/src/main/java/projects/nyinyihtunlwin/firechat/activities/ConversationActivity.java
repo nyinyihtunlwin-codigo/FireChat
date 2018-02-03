@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -19,10 +20,13 @@ import com.bumptech.glide.request.RequestOptions;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import projects.nyinyihtunlwin.firechat.R;
+import projects.nyinyihtunlwin.firechat.data.models.FireChatModel;
 
-public class ConversationActivity extends AppCompatActivity {
+public class ConversationActivity extends AppCompatActivity implements View.OnClickListener {
 
     public static final int PICK_IMAGE_REQUEST = 1;
+
+    public static final String PARTNER_ID = "partner_id";
 
     @BindView(R.id.iv_add_photo)
     ImageView ivAddPhoto;
@@ -36,9 +40,18 @@ public class ConversationActivity extends AppCompatActivity {
     @BindView(R.id.rl_selected_photo)
     RelativeLayout rlSelectedPhoto;
 
+    @BindView(R.id.iv_send)
+    ImageView ivSend;
 
-    public static Intent newIntent(Context context) {
+    @BindView(R.id.et_message)
+    EditText etMessage;
+
+    private String mPartnerId;
+    private String mPhotoUrl;
+
+    public static Intent newIntent(Context context, String partnerId) {
         Intent intent = new Intent(context, ConversationActivity.class);
+        intent.putExtra(PARTNER_ID, partnerId);
         return intent;
     }
 
@@ -52,24 +65,17 @@ public class ConversationActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        ivAddPhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent();
-                // Show only images, no videos or anything else
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                // Always show the chooser (if there are multiple options available)
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
-            }
-        });
+        if (!getIntent().getStringExtra(PARTNER_ID).isEmpty()) {
+            mPartnerId = getIntent().getStringExtra(PARTNER_ID);
+        }
 
-        ivClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                rlSelectedPhoto.setVisibility(View.GONE);
-            }
-        });
+        FireChatModel.getInstance().startConversation(mPartnerId);
+
+        ivAddPhoto.setOnClickListener(this);
+
+        ivClose.setOnClickListener(this);
+
+        ivSend.setOnClickListener(this);
     }
 
     @Override
@@ -85,6 +91,7 @@ public class ConversationActivity extends AppCompatActivity {
     }
 
     private void onPhotoTaken(String photoUrl) {
+        mPhotoUrl=photoUrl;
         if (TextUtils.isEmpty(photoUrl)) {
             Snackbar.make(ivAddPhoto, "ERROR : Path to photo is empty.", Snackbar.LENGTH_LONG).show();
             rlSelectedPhoto.setVisibility(View.GONE);
@@ -105,5 +112,24 @@ public class ConversationActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.iv_send:
+                String message = etMessage.getText().toString();
+                FireChatModel.getInstance().sendMessage(mPhotoUrl,message);
+                break;
+            case R.id.iv_close:
+                rlSelectedPhoto.setVisibility(View.GONE);
+                break;
+            case R.id.iv_add_photo:
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+                break;
+        }
     }
 }

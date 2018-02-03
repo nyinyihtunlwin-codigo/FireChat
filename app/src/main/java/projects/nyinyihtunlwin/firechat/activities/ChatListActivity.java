@@ -129,7 +129,7 @@ public class ChatListActivity extends BaseActivity implements ChatListView, Goog
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onTapConversation(TapChatEvent event) {
-        ChatListPresenter.getInstance().onTapConversation(event.getUser());
+        ChatListPresenter.getInstance().onTapConversation(event.getPartnerId());
     }
 
 
@@ -183,8 +183,8 @@ public class ChatListActivity extends BaseActivity implements ChatListView, Goog
     }
 
     @Override
-    public void navigateToConversationScreen(UserVO userVO) {
-        Intent intent = ConversationActivity.newIntent(getApplicationContext());
+    public void navigateToConversationScreen(String partnerId) {
+        Intent intent = ConversationActivity.newIntent(getApplicationContext(), partnerId);
         startActivity(intent);
     }
 

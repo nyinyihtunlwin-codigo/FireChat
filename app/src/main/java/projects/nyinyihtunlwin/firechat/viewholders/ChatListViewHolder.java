@@ -54,6 +54,6 @@ public class ChatListViewHolder extends BaseViewHolder<UserVO> implements View.O
 
     @Override
     public void onClick(View view) {
-        EventBus.getDefault().post(new TapChatEvent(mData));
+        EventBus.getDefault().post(new TapChatEvent(mData.getUserId()));
     }
 }

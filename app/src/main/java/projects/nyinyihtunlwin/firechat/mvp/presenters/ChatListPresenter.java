@@ -1,12 +1,8 @@
 package projects.nyinyihtunlwin.firechat.mvp.presenters;
 
-import android.util.Log;
-
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
-import projects.nyinyihtunlwin.firechat.FireChatApp;
 import projects.nyinyihtunlwin.firechat.data.models.FireChatModel;
-import projects.nyinyihtunlwin.firechat.data.vo.UserVO;
 import projects.nyinyihtunlwin.firechat.mvp.views.ChatListView;
 
 /**
@@ -17,7 +13,7 @@ public class ChatListPresenter extends BasePresenter<ChatListView> {
 
     private static ChatListPresenter objectInstance;
 
-    private UserVO mUserVO;
+    private String mPartnerId;
 
 
     private ChatListPresenter() {
@@ -46,13 +42,12 @@ public class ChatListPresenter extends BasePresenter<ChatListView> {
 
     }
 
-    public void onTapConversation(UserVO userVO) {
+    public void onTapConversation(String partnerId) {
 
-        mUserVO = userVO;
+        mPartnerId = partnerId;
 
         if (FireChatModel.getInstance().isUserAuthenticate()) {
-            mView.navigateToConversationScreen(userVO);
-            FireChatModel.getInstance().startConversation(userVO);
+            mView.navigateToConversationScreen(partnerId);
         } else {
             mView.showAuthenticationDialog();
         }
@@ -62,8 +57,7 @@ public class ChatListPresenter extends BasePresenter<ChatListView> {
         FireChatModel.getInstance().authenticateUserWithGoogleAccount(signInAccount, new FireChatModel.UserAuthenticateDelegate() {
             @Override
             public void onSuccessAuthenticate(GoogleSignInAccount signInAccount) {
-                FireChatModel.getInstance().startConversation(mUserVO);
-                mView.navigateToConversationScreen(mUserVO);
+                mView.navigateToConversationScreen(mPartnerId);
             }
 
             @Override
